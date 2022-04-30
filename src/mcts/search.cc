@@ -25,6 +25,8 @@
   Program grant you additional permission to convey the resulting work.
 */
 
+#define _USE_MATH_DEFINES
+
 #include "mcts/search.h"
 
 #include <algorithm>
@@ -36,6 +38,7 @@
 #include <iterator>
 #include <sstream>
 #include <thread>
+#include <cmath>
 
 #include "mcts/node.h"
 #include "neural/cache.h"
@@ -200,7 +203,7 @@ void Search::SendUciInfo() REQUIRES(nodes_mutex_) REQUIRES(counters_mutex_) {
   const auto score_type = params_.GetScoreType();
   const auto per_pv_counters = params_.GetPerPvCounters();
   const auto display_cache_usage = params_.GetDisplayCacheUsage();
-  const auto draw_score = GetDrawScore(false);
+  const auto draw_score = GetDrawScore(false, root_node_);
 
   std::vector<ThinkingInfo> uci_infos;
 
@@ -334,9 +337,9 @@ int64_t Search::GetTimeSinceFirstBatch() const REQUIRES(counters_mutex_) {
 }
 
 // Root is depth 0, i.e. even depth.
-float Search::GetDrawScore(bool is_odd_depth) const {
-  return (is_odd_depth ? params_.GetOpponentDrawScore()
-                       : params_.GetSidetomoveDrawScore()) +
+float Search::GetDrawScore(bool is_odd_depth, Node* node) const {
+        return (is_odd_depth ? -(params_.GetOptimismMaxEffect() /(1 + pow(M_E, -(params_.GetOptimismSlope() * node->GetWL()) + params_.GetOptimismBias() ))) 
+                             : -(params_.GetOptimismMaxEffect() /(1 + pow(M_E,  (params_.GetOptimismSlope() * node->GetWL()) + params_.GetOptimismBias())))) + 
          (is_odd_depth == played_history_.IsBlackToMove()
               ? params_.GetWhiteDrawDelta()
               : params_.GetBlackDrawDelta());
@@ -375,7 +378,7 @@ std::vector<std::string> Search::GetVerboseStats(Node* node) const {
   const bool is_root = (node == root_node_);
   const bool is_odd_depth = !is_root;
   const bool is_black_to_move = (played_history_.IsBlackToMove() == is_root);
-  const float draw_score = GetDrawScore(is_odd_depth);
+  const float draw_score = GetDrawScore(is_odd_depth, node);
   const float fpu = GetFpu(params_, node, is_root, draw_score);
   const float cpuct = ComputeCpuct(params_, node->GetN(), is_root);
   const float U_coeff =
@@ -637,7 +640,7 @@ std::vector<EdgeAndNode> Search::GetBestChildrenNoTemperature(Node* parent,
   // the node, so exit quickly.
   if (parent->GetN() == 0) return {};
   const bool is_odd_depth = (depth % 2) == 1;
-  const float draw_score = GetDrawScore(is_odd_depth);
+  const float draw_score = GetDrawScore(is_odd_depth, parent);
   // Best child is selected using the following criteria:
   // * Prefer shorter terminal wins / avoid shorter terminal losses.
   // * Largest number of playouts.
@@ -739,7 +742,7 @@ EdgeAndNode Search::GetBestChildNoTemperature(Node* parent, int depth) const {
 // count.
 EdgeAndNode Search::GetBestRootChildWithTemperature(float temperature) const {
   // Root is at even depth.
-  const float draw_score = GetDrawScore(/* is_odd_depth= */ false);
+  const float draw_score = GetDrawScore(/* is_odd_depth= */ false, root_node_);
 
   std::vector<float> cumulative_sums;
   float sum = 0.0;
@@ -851,7 +854,7 @@ void Search::PopulateCommonIterationStats(IterationStats* stats) {
 
   // If root node hasn't finished first visit, none of this code is safe.
   if (root_node_->GetN() > 0) {
-    const auto draw_score = GetDrawScore(true);
+    const auto draw_score = GetDrawScore(true, root_node_);
     const float fpu =
         GetFpu(params_, root_node_, /* is_root_node */ true, draw_score);
     float max_q_plus_m = -1000;
@@ -1503,8 +1506,8 @@ void SearchWorker::PickNodesToExtendTask(
   int completed_visits = 0;
 
   bool is_root_node = node == search_->root_node_;
-  const float even_draw_score = search_->GetDrawScore(false);
-  const float odd_draw_score = search_->GetDrawScore(true);
+  const float even_draw_score = search_->GetDrawScore(false, node);
+  const float odd_draw_score = search_->GetDrawScore(true, node);
   const auto& root_move_filter = search_->root_move_filter_;
   auto m_evaluator = moves_left_support_ ? MEvaluator(params_) : MEvaluator();
 
@@ -2010,7 +2013,6 @@ void SearchWorker::MaybePrefetchIntoCache() {
 // Prefetches up to @budget nodes into cache. Returns number of nodes
 // prefetched.
 int SearchWorker::PrefetchIntoCache(Node* node, int budget, bool is_odd_depth) {
-  const float draw_score = search_->GetDrawScore(is_odd_depth);
   if (budget <= 0) return 0;
 
   // We are in a leaf, which is not yet being processed.
@@ -2038,6 +2040,7 @@ int SearchWorker::PrefetchIntoCache(Node* node, int budget, bool is_odd_depth) {
       ComputeCpuct(params_, node->GetN(), node == search_->root_node_);
   const float puct_mult =
       cpuct * std::sqrt(std::max(node->GetChildrenVisits(), 1u));
+  const float draw_score = search_->GetDrawScore(is_odd_depth, node);
   const float fpu =
       GetFpu(params_, node, node == search_->root_node_, draw_score);
   for (auto& edge : node->Edges()) {

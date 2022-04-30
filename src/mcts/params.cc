@@ -269,6 +269,15 @@ const OptionId SearchParams::kDrawScoreWhiteId{
 const OptionId SearchParams::kDrawScoreBlackId{
     "draw-score-black", "DrawScoreBlack",
     "Adjustment, added to a draw score of a black player."};
+const OptionId SearchParams::kOptimismMaxEffectId{
+    "optimism-max-effect", "OptimismMaxEffect",
+    "Maximum drawscore applied to DSSTM/DSO when absolute Q is 1. The parameter value is divided by 100 before it is applied"};
+const OptionId SearchParams::kOptimismSlopeId{
+    "optimism-slope", "OptimismSlope",
+    "Rate of increase of DSSTM/DSO as absolute Q increases"};
+const OptionId SearchParams::kOptimismBiasId{
+    "optimism-bias", "OptimismBias",
+    "The bias of DSSTM/DSO with respect to the side with advantage"};
 const OptionId SearchParams::kNpsLimitId{
     "nps-limit", "NodesPerSecondLimit",
     "An option to specify an upper limit to the nodes per second searched. The "
@@ -386,6 +395,9 @@ void SearchParams::Populate(OptionsParser* options) {
   options->Add<IntOption>(kDrawScoreOpponentId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreWhiteId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreBlackId, -100, 100) = 0;
+  options->Add<FloatOption>(kOptimismMaxEffectId, -100, 100) = 45;
+  options->Add<FloatOption>(kOptimismSlopeId, -100, 100) = 5;
+  options->Add<FloatOption>(kOptimismBiasId, -100, 100) = 1.4;
   options->Add<FloatOption>(kNpsLimitId, 0.0f, 1e6f) = 0.0f;
   options->Add<IntOption>(kSolidTreeThresholdId, 1, 2000000000) = 100;
   options->Add<IntOption>(kTaskWorkersPerSearchWorkerId, 0, 128) =
@@ -465,6 +477,11 @@ SearchParams::SearchParams(const OptionsDict& options)
       kDrawScoreOpponent{options.Get<int>(kDrawScoreOpponentId) / 100.0f},
       kDrawScoreWhite{options.Get<int>(kDrawScoreWhiteId) / 100.0f},
       kDrawScoreBlack{options.Get<int>(kDrawScoreBlackId) / 100.0f},
+
+      kOptimismMaxEffect{options.Get<float>(kOptimismMaxEffectId) / 100.0f},
+      kOptimismSlope{options.Get<float>(kOptimismSlopeId)},
+      kOptimismBias{options.Get<float>(kOptimismBiasId)},
+
       kMaxOutOfOrderEvals(std::max(
           1, static_cast<int>(options.Get<float>(kMaxOutOfOrderEvalsId) *
                               options.Get<int>(kMiniBatchSizeId)))),

@@ -108,6 +108,9 @@ class SearchParams {
   float GetOpponentDrawScore() const { return kDrawScoreOpponent; }
   float GetWhiteDrawDelta() const { return kDrawScoreWhite; }
   float GetBlackDrawDelta() const { return kDrawScoreBlack; }
+  float GetOptimismMaxEffect() const { return kOptimismMaxEffect; }
+  float GetOptimismSlope() const { return kOptimismSlope; }
+  float GetOptimismBias() const { return kOptimismBias; }
   int GetMaxOutOfOrderEvals() const { return kMaxOutOfOrderEvals; }
   float GetNpsLimit() const { return kNpsLimit; }
   int GetSolidTreeThreshold() const { return kSolidTreeThreshold; }
@@ -188,6 +191,9 @@ class SearchParams {
   static const OptionId kDrawScoreOpponentId;
   static const OptionId kDrawScoreWhiteId;
   static const OptionId kDrawScoreBlackId;
+  static const OptionId kOptimismMaxEffectId;
+  static const OptionId kOptimismSlopeId;
+  static const OptionId kOptimismBiasId;
   static const OptionId kMaxOutOfOrderEvalsId;
   static const OptionId kNpsLimitId;
   static const OptionId kSolidTreeThresholdId;
@@ -244,6 +250,9 @@ class SearchParams {
   const float kDrawScoreOpponent;
   const float kDrawScoreWhite;
   const float kDrawScoreBlack;
+  const float kOptimismMaxEffect;
+  const float kOptimismSlope;
+  const float kOptimismBias;
   const int kMaxOutOfOrderEvals;
   const float kNpsLimit;
   const int kSolidTreeThreshold;
