@@ -2230,7 +2230,7 @@ void SearchWorker::DoBackupUpdateSingleNode(
                       : -(params_.GetOptimismMaxEffect() /
                           (1 + pow(M_E, -(params_.GetOptimismSlope() * v) +
                                             params_.GetOptimismBias()))));
-    float newV = v + ((100 - v) * drawscore);
+    float newV = v + (d * drawscore);
 
     n->FinalizeScoreUpdate(v, d, m, node_to_process.multivisit);
     if (n_to_fix > 0 && !n->IsTerminal()) {
