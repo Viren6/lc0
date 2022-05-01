@@ -2223,9 +2223,9 @@ void SearchWorker::DoBackupUpdateSingleNode(
       d = n->GetD();
       m = n->GetM();
     }
-    float drawscore =
-        (depth % 2 == 1 ? -(params_.GetOptimismMaxEffect() /
-                          (1 + pow(M_E, (params_.GetOptimismSlope() * v) +
+    float drawscore = ((node_to_process.depth + depth) % 2 == 1
+                           ? -(params_.GetOptimismMaxEffect() /
+                          (1 + pow(M_E, (params_.GetOptimismSlope() * -v) +
                                             params_.GetOptimismBias())))
                       : -(params_.GetOptimismMaxEffect() /
                           (1 + pow(M_E, -(params_.GetOptimismSlope() * v) +

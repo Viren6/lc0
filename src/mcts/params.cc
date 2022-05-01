@@ -396,8 +396,8 @@ void SearchParams::Populate(OptionsParser* options) {
   options->Add<IntOption>(kDrawScoreOpponentId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreWhiteId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreBlackId, -100, 100) = 0;
-  options->Add<FloatOption>(kOptimismMaxEffectId, -200, 200) = 0;
-  options->Add<FloatOption>(kOptimismSlopeId, -20, 20) = 0;
+  options->Add<FloatOption>(kOptimismMaxEffectId, -300, 300) = 0;
+  options->Add<FloatOption>(kOptimismSlopeId, -25, 25) = 0;
   options->Add<FloatOption>(kOptimismBiasId, -10, 10) = 0;
   options->Add<FloatOption>(kNpsLimitId, 0.0f, 1e6f) = 0.0f;
   options->Add<IntOption>(kSolidTreeThresholdId, 1, 2000000000) = 100;
