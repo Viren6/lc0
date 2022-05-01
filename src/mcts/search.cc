@@ -25,6 +25,8 @@
   Program grant you additional permission to convey the resulting work.
 */
 
+#define _USE_MATH_DEFINES
+
 #include "mcts/search.h"
 
 #include <algorithm>
@@ -36,6 +38,7 @@
 #include <iterator>
 #include <sstream>
 #include <thread>
+#include <cmath>
 
 #include "mcts/node.h"
 #include "neural/cache.h"
@@ -2198,7 +2201,10 @@ void SearchWorker::DoBackupUpdateSingleNode(
       params_.GetStickyEndgames() && node->IsTerminal() && !node->GetN();
 
   // Backup V value up to a root. After 1 visit, V = Q.
+
+
   float v = node_to_process.v;
+  int depth = 0;
   float d = node_to_process.d;
   float m = node_to_process.m;
   int n_to_fix = 0;
@@ -2217,6 +2223,15 @@ void SearchWorker::DoBackupUpdateSingleNode(
       d = n->GetD();
       m = n->GetM();
     }
+    float drawscore =
+        (depth % 2 == 1 ? -(params_.GetOptimismMaxEffect() /
+                          (1 + pow(M_E, (params_.GetOptimismSlope() * v) +
+                                            params_.GetOptimismBias())))
+                      : -(params_.GetOptimismMaxEffect() /
+                          (1 + pow(M_E, -(params_.GetOptimismSlope() * v) +
+                                            params_.GetOptimismBias()))));
+    float newV = v + ((100 - v) * drawscore);
+
     n->FinalizeScoreUpdate(v, d, m, node_to_process.multivisit);
     if (n_to_fix > 0 && !n->IsTerminal()) {
       n->AdjustForTerminal(v_delta, d_delta, m_delta, n_to_fix);
@@ -2243,6 +2258,7 @@ void SearchWorker::DoBackupUpdateSingleNode(
 
     // Q will be flipped for opponent.
     v = -v;
+    depth++;
     v_delta = -v_delta;
     m++;
 
