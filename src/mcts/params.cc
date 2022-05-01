@@ -395,9 +395,9 @@ void SearchParams::Populate(OptionsParser* options) {
   options->Add<IntOption>(kDrawScoreOpponentId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreWhiteId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreBlackId, -100, 100) = 0;
-  options->Add<FloatOption>(kOptimismMaxEffectId, -100, 100) = 45;
-  options->Add<FloatOption>(kOptimismSlopeId, -100, 100) = 5;
-  options->Add<FloatOption>(kOptimismBiasId, -100, 100) = 1.4;
+  options->Add<FloatOption>(kOptimismMaxEffectId, -200, 200) = 45;
+  options->Add<FloatOption>(kOptimismSlopeId, -20, 20) = 5;
+  options->Add<FloatOption>(kOptimismBiasId, -10, 10) = 1.4;
   options->Add<FloatOption>(kNpsLimitId, 0.0f, 1e6f) = 0.0f;
   options->Add<IntOption>(kSolidTreeThresholdId, 1, 2000000000) = 100;
   options->Add<IntOption>(kTaskWorkersPerSearchWorkerId, 0, 128) =
