@@ -279,6 +279,9 @@ const OptionId SearchParams::kOptimismSlopeId{
 const OptionId SearchParams::kOptimismBiasId{
     "optimism-bias", "OptimismBias",
     "The bias of DSSTM/DSO with respect to the side with advantage"};
+const OptionId SearchParams::kOptimismBackPropWeightId{
+    "optimism-back-prop-weight", "OptimismBackPropWeight",
+    "V is forward propogated down the tree weighted by the exponent (1 + OptimismBackPropWeight/100)*(Depth from leaf). This V value is then used to calculate drawscore"};
 const OptionId SearchParams::kNpsLimitId{
     "nps-limit", "NodesPerSecondLimit",
     "An option to specify an upper limit to the nodes per second searched. The "
@@ -396,9 +399,10 @@ void SearchParams::Populate(OptionsParser* options) {
   options->Add<IntOption>(kDrawScoreOpponentId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreWhiteId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreBlackId, -100, 100) = 0;
-  options->Add<FloatOption>(kOptimismMaxEffectId, -300, 300) = 0;
-  options->Add<FloatOption>(kOptimismSlopeId, -25, 25) = 0;
-  options->Add<FloatOption>(kOptimismBiasId, -10, 10) = 0;
+  options->Add<FloatOption>(kOptimismMaxEffectId, -400, 400) = 0;
+  options->Add<FloatOption>(kOptimismSlopeId, -80, 80) = 0;
+  options->Add<FloatOption>(kOptimismBiasId, -20, 20) = 0;
+  options->Add<FloatOption>(kOptimismBackPropWeightId, -96, 200) = 0;
   options->Add<FloatOption>(kNpsLimitId, 0.0f, 1e6f) = 0.0f;
   options->Add<IntOption>(kSolidTreeThresholdId, 1, 2000000000) = 100;
   options->Add<IntOption>(kTaskWorkersPerSearchWorkerId, 0, 128) =
@@ -482,6 +486,7 @@ SearchParams::SearchParams(const OptionsDict& options)
       kOptimismMaxEffect{options.Get<float>(kOptimismMaxEffectId) / 100.0f},
       kOptimismSlope{options.Get<float>(kOptimismSlopeId)},
       kOptimismBias{options.Get<float>(kOptimismBiasId)},
+      kOptimismBackPropWeight{options.Get<float>(kOptimismBackPropWeightId) / 100.0f},
 
       kMaxOutOfOrderEvals(std::max(
           1, static_cast<int>(options.Get<float>(kMaxOutOfOrderEvalsId) *

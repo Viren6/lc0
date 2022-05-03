@@ -112,6 +112,7 @@ class SearchParams {
   float GetOptimismMaxEffect() const { return kOptimismMaxEffect; }
   float GetOptimismSlope() const { return kOptimismSlope; }
   float GetOptimismBias() const { return kOptimismBias; }
+  float GetOptimismBackPropWeight() const { return kOptimismBackPropWeight; }
 
   int GetMaxOutOfOrderEvals() const { return kMaxOutOfOrderEvals; }
   float GetNpsLimit() const { return kNpsLimit; }
@@ -197,6 +198,7 @@ class SearchParams {
   static const OptionId kOptimismMaxEffectId;
   static const OptionId kOptimismSlopeId;
   static const OptionId kOptimismBiasId;
+  static const OptionId kOptimismBackPropWeightId;
 
   static const OptionId kMaxOutOfOrderEvalsId;
   static const OptionId kNpsLimitId;
@@ -258,6 +260,7 @@ class SearchParams {
   const float kOptimismMaxEffect;
   const float kOptimismSlope;
   const float kOptimismBias;
+  const float kOptimismBackPropWeight;
 
   const int kMaxOutOfOrderEvals;
   const float kNpsLimit;

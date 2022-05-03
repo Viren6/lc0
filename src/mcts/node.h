@@ -171,6 +171,7 @@ class Node {
   float GetD() const { return d_; }
   float GetM() const { return m_; }
 
+
   // Returns whether the node is known to be draw/lose/win.
   bool IsTerminal() const { return terminal_type_ != Terminal::NonTerminal; }
   bool IsTbTerminal() const { return terminal_type_ == Terminal::Tablebase; }
