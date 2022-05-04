@@ -269,6 +269,9 @@ const OptionId SearchParams::kDrawScoreWhiteId{
 const OptionId SearchParams::kDrawScoreBlackId{
     "draw-score-black", "DrawScoreBlack",
     "Adjustment, added to a draw score of a black player."};
+const OptionId SearchParams::kOptimismIterationsId{
+    "optimism-iterations", "OptimismIterations",
+    "The number of times optimism is applied to each node"};
 const OptionId SearchParams::kOptimismMaxEffectId{
     "optimism-max-effect", "OptimismMaxEffect",
     "Maximum drawscore applied to DSSTM/DSO when absolute Q is 1. The "
@@ -391,18 +394,18 @@ void SearchParams::Populate(OptionsParser* options) {
   options->Add<FloatOption>(kMovesLeftSlopeId, 0.0f, 1.0f) = 0.0027f;
   options->Add<FloatOption>(kMovesLeftConstantFactorId, -1.0f, 1.0f) = 0.0f;
   options->Add<FloatOption>(kMovesLeftScaledFactorId, -2.0f, 2.0f) = 1.6521f;
-  options->Add<FloatOption>(kMovesLeftQuadraticFactorId, -1.0f, 1.0f) =
-      -0.6521f;
+  options->Add<FloatOption>(kMovesLeftQuadraticFactorId, -1.0f, 1.0f) = -0.6521f;
   options->Add<BoolOption>(kDisplayCacheUsageId) = false;
   options->Add<IntOption>(kMaxConcurrentSearchersId, 0, 128) = 1;
   options->Add<IntOption>(kDrawScoreSidetomoveId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreOpponentId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreWhiteId, -100, 100) = 0;
   options->Add<IntOption>(kDrawScoreBlackId, -100, 100) = 0;
+  options->Add<IntOption>(kOptimismIterationsId, 1, 15) = 1;
   options->Add<FloatOption>(kOptimismMaxEffectId, -400, 400) = 0;
   options->Add<FloatOption>(kOptimismSlopeId, -80, 80) = 0;
   options->Add<FloatOption>(kOptimismBiasId, -20, 20) = 0;
-  options->Add<FloatOption>(kOptimismBackPropWeightId, -96, 200) = 0;
+  options->Add<FloatOption>(kOptimismBackPropWeightId, -96, 300) = 0;
   options->Add<FloatOption>(kNpsLimitId, 0.0f, 1e6f) = 0.0f;
   options->Add<IntOption>(kSolidTreeThresholdId, 1, 2000000000) = 100;
   options->Add<IntOption>(kTaskWorkersPerSearchWorkerId, 0, 128) =
@@ -483,6 +486,7 @@ SearchParams::SearchParams(const OptionsDict& options)
       kDrawScoreWhite{options.Get<int>(kDrawScoreWhiteId) / 100.0f},
       kDrawScoreBlack{options.Get<int>(kDrawScoreBlackId) / 100.0f},
 
+      kOptimismIterations{options.Get<int>(kOptimismIterationsId)},
       kOptimismMaxEffect{options.Get<float>(kOptimismMaxEffectId) / 100.0f},
       kOptimismSlope{options.Get<float>(kOptimismSlopeId)},
       kOptimismBias{options.Get<float>(kOptimismBiasId)},

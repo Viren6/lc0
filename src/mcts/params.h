@@ -109,6 +109,7 @@ class SearchParams {
   float GetWhiteDrawDelta() const { return kDrawScoreWhite; }
   float GetBlackDrawDelta() const { return kDrawScoreBlack; }
 
+    int GetOptimismIterations() const { return kOptimismIterations; }
   float GetOptimismMaxEffect() const { return kOptimismMaxEffect; }
   float GetOptimismSlope() const { return kOptimismSlope; }
   float GetOptimismBias() const { return kOptimismBias; }
@@ -195,6 +196,8 @@ class SearchParams {
   static const OptionId kDrawScoreWhiteId;
   static const OptionId kDrawScoreBlackId;
 
+  
+  static const OptionId kOptimismIterationsId;
   static const OptionId kOptimismMaxEffectId;
   static const OptionId kOptimismSlopeId;
   static const OptionId kOptimismBiasId;
@@ -257,6 +260,7 @@ class SearchParams {
   const float kDrawScoreWhite;
   const float kDrawScoreBlack;
 
+  const int kOptimismIterations;
   const float kOptimismMaxEffect;
   const float kOptimismSlope;
   const float kOptimismBias;

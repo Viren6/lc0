@@ -249,6 +249,7 @@ void Search::SendUciInfo() REQUIRES(nodes_mutex_) REQUIRES(counters_mutex_) {
       uci_info.score = 90 * tan(1.5637541897 * q);
     } else if (score_type == "centipawn") {
       uci_info.score = 90 * tan(1.5637541897 * wl);
+      //COUT << "Q: " + std::to_string(q) + " WL: " + std::to_string(wl);
     } else if (score_type == "centipawn_2019") {
       uci_info.score = 295 * wl / (1 - 0.976953126 * std::pow(wl, 14));
     } else if (score_type == "centipawn_2018") {
@@ -2224,55 +2225,18 @@ void SearchWorker::DoBackupUpdateSingleNode(
       m = n->GetM();
     }
 
-        float accumulatedVTotal = v;
-    float accumulatedWeight = 1;
-    if (p != nullptr) {
-      int depth2 = 1;
-      for (Node *n2 = p, *p2; n2 != search_->root_node_->GetParent(); n2 = p2) {
-        float multiplier =
-            pow((1 + params_.GetOptimismBackPropWeight()), depth2);
-
-        accumulatedWeight += multiplier;
-        if ((node_to_process.depth - depth2) % 2 == 1) {
-          accumulatedVTotal += -(n2->GetWL() * multiplier);
-        } else {
-          accumulatedVTotal += n2->GetWL() * multiplier;
-        }
-
-        p2 = n2->GetParent();
-        depth2++;
-      }
-    }
-
-    float accumulatedV = accumulatedVTotal / accumulatedWeight;
-
-
-      //float drawscore =
-      //    ((node_to_process.depth - depth) % 2 == 0
-      //         ? -(params_.GetOptimismMaxEffect() /
-      //           (1 + pow(M_E, (params_.GetOptimismSlope() * -accumulatedV) +
-      //                               params_.GetOptimismBias())))
-      //         : -(params_.GetOptimismMaxEffect() /
-      //           (1 + pow(M_E, -(params_.GetOptimismSlope() * accumulatedV) +
-      //                               params_.GetOptimismBias()))));
-    float drawscore =
-        ((node_to_process.depth - depth) % 2 == 0
-            ? -(accumulatedV < 0 ? 0 : params_.GetOptimismMaxEffect())
-             : -(-accumulatedV > 0 ? 0 : params_.GetOptimismMaxEffect()));
+      float drawscore =
+          ((node_to_process.depth - depth) % 2 == 0
+               ? -(params_.GetOptimismMaxEffect() /
+                 (1 + pow(M_E, (params_.GetOptimismSlope() * -v) +
+                                     params_.GetOptimismBias())))
+               : -(params_.GetOptimismMaxEffect() /
+                 (1 + pow(M_E, -(params_.GetOptimismSlope() * -v) +
+                                     params_.GetOptimismBias()))));
 
 
       float newV = v + (d * drawscore);
 
-          COUT << "Ran: Node to process Depth " +
-                  std::to_string(node_to_process.depth) +
-                  " Backprop Depth: " + std::to_string(depth) +
-                  " Old V: " + std::to_string(v) +
-                  " New V: " + std::to_string(newV) +
-                  // " Parent V: " + std::to_string(n2->GetParent()->GetWL()) +
-                  " Accumulated V weight: " +
-                  std::to_string(accumulatedWeight) +
-                  " D: " + std::to_string(d) +
-                  " Accumulated V Total: " + std::to_string(accumulatedVTotal);
 
     n->FinalizeScoreUpdate(newV, d, m, node_to_process.multivisit);
     if (n_to_fix > 0 && !n->IsTerminal()) {
